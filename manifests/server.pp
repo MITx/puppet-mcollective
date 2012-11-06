@@ -13,17 +13,17 @@ class mcollective::server(
 
   # Mcollective will break itself by default, so we need to get there first
   file { '/etc/mcollective':
-    ensure => directory,
-    mode   => '0600',
-    owner  => 'root',
-    group  => 'root',
+    ensure  => directory,
+    mode    => '0600',
+    owner   => 'root',
+    group   => 'root',
+    require => Class['mcollective::package::server'],
   }
 
   concat { '/etc/mcollective/server.cfg':
     mode    => '0600',
     owner   => 'root',
     group   => 'root',
-    before  => Package['mcollective'],
   }
 
   concat::fragment { 'mcollective base':
