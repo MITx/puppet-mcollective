@@ -39,7 +39,7 @@ class mcollective::server(
     subscribe => File['/etc/mcollective/server.cfg'],
   }
 
-  mcollective::connector { 'base':
+  mcollective::connector { '/etc/mcollective/server.cfg':
     type => $connector_type,
     pool => [
       {
