@@ -16,9 +16,9 @@ class mcollective::params {
 
   $psk = hiera('mcollective_psk')
 
-  $connector_host     = hiera(mcollective::server::host)
-  $connector_port     = hiera(mcollective::server::port)
-  $connector_user     = hiera(mcollective::server::user)
-  $connector_password = hiera(mcollective::server::password)
-  $connector_ssl      = hiera(mcollective::server::ssl)
+  $connector_host     = hiera(mcollective::server::connector_host)
+  $connector_port     = hiera(mcollective::server::connector_port)
+  $connector_user     = hiera(mcollective::server::connector_user)
+  $connector_password = hiera(mcollective::server::connector_password)
+  $connector_ssl      = hiera(mcollective::server::connector_ssl)
 }
