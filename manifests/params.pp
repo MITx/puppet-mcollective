@@ -21,4 +21,5 @@ class mcollective::params {
   $connector_user     = hiera(mcollective::server::connector_user, 'mcollective')
   $connector_password = hiera(mcollective::server::connector_password, 'mcollective')
   $connector_ssl      = hiera(mcollective::server::connector_ssl, {})
+  $connector_type     = hiera(mcollective::server::connector_type, 'activemq')
 }
