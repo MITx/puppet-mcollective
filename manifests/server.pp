@@ -9,9 +9,9 @@ class mcollective::server(
   $main_collective    = 'mcollective',
 ) {
 
-  include mcollective::package::server
+  include '::mcollective::package::server'
+  include '::mcollective::params'
 
-  # Mcollective will break itself by default, so we need to get there first
   file { '/etc/mcollective':
     ensure  => directory,
     mode    => '0600',
