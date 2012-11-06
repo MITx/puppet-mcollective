@@ -1,4 +1,13 @@
-class mcollective::server($main_collective = 'mcollective', $collectives = ['mcollective']) {
+class mcollective::server(
+  $collectives        = ['mcollective'],
+  $connector_host     = 'localhost',
+  $connector_password = 'mcollective',
+  $connector_port     = '61614',
+  $connector_ssl      = {},
+  $connector_type     = 'activemq',
+  $connector_user     = 'mcollective',
+  $main_collective    = 'mcollective',
+) {
 
   include mcollective::package::server
 
@@ -14,7 +23,7 @@ class mcollective::server($main_collective = 'mcollective', $collectives = ['mco
     mode    => '0600',
     owner   => 'root',
     group   => 'root',
-    before => Package['mcollective'],
+    before  => Package['mcollective'],
   }
 
   concat::fragment { 'mcollective base':
@@ -28,6 +37,19 @@ class mcollective::server($main_collective = 'mcollective', $collectives = ['mco
     enable    => true,
     require   => Package['mcollective'],
     subscribe => File['/etc/mcollective/server.cfg'],
+  }
+
+  class { 'mcollective::connector':
+    type => $connector_type,
+    pool => [
+      {
+        host     => $connector_host,
+        port     => $connector_port,
+        user     => $connector_user,
+        password => $connector_password,
+        ssl      => $connector_ssl,
+      }
+    ],
   }
 
   include mcollective::server::defaultplugins
