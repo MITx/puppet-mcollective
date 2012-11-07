@@ -5,9 +5,11 @@ class mcollective::package::server {
 
   case $::osfamily {
     Debian: {
-      package { 'ruby-stomp':
-        ensure => present,
-        before => Package['mcollective'],
+      # Switch to a gem because of how outdated the stomp package is.
+      package { 'stomp':
+        ensure   => present,
+        provider => gem,
+        before   => Package['mcollective'],
       }
     }
   }
@@ -19,7 +21,7 @@ class mcollective::package::server {
   # Mcollective packages currently install into ruby/1.8 instead of vendor_ruby
   # for compatibility with hardy. If the current rubyversion is 1.9 then we
   # need symlinks so mcollective can find itself.
-  if $rubyversion =~ /^1\.9/ {
+  if $::rubyversion =~ /^1\.9/ {
     file {
       '/usr/lib/ruby/vendor_ruby/mcollective.rb':
         ensure => link,
