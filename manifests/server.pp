@@ -1,42 +1,44 @@
 class mcollective::server(
-  $collectives        = ['mcollective'],
-  $connector_host     = 'localhost',
-  $connector_password = 'mcollective',
-  $connector_port     = '61614',
-  $connector_ssl      = {},
-  $connector_type     = 'activemq',
-  $connector_user     = 'mcollective',
-  $main_collective    = 'mcollective',
+  $main_collective = 'mcollective',
+  $collectives     = ['mcollective']
 ) {
 
-  include '::mcollective::package::server'
-  include '::mcollective::params'
+  include mcollective::package::server
+  include mcollective::params
 
-  file { '/etc/mcollective':
-    ensure  => directory,
-    mode    => '0600',
-    owner   => 'root',
-    group   => 'root',
-    require => Class['mcollective::package::server'],
+  $configdir   = $mcollective::params::configdir
+  $servicename = $mcollective::params::servicename
+
+  $core_libdir   = $mcollective::params::core_libdir
+  $custom_libdir = $mcollective::params::custom_libdir
+  $extra_libdirs = $mcollective::params::extra_libdirs
+
+  # Mcollective will break itself by default, so we need to get there first
+  file { $configdir:
+    ensure => directory,
+    mode   => '0600',
+    owner  => 'root',
+    group  => 0,
   }
 
-  concat { '/etc/mcollective/server.cfg':
-    mode    => '0600',
-    owner   => 'root',
-    group   => 'root',
+  concat { "${configdir}/server.cfg":
+    mode   => '0600',
+    owner  => 'root',
+    group  => 0,
+    before => Package['mcollective'],
   }
 
   concat::fragment { 'mcollective base':
     order   => 0,
     content => template('mcollective/server.cfg.erb'),
-    target  => '/etc/mcollective/server.cfg',
+    target  => "${configdir}/server.cfg",
   }
 
-  service { 'mcollective':
+  service { $servicename:
     ensure    => running,
     enable    => true,
     require   => Package['mcollective'],
-    subscribe => File['/etc/mcollective/server.cfg'],
+    subscribe => File["${configdir}/server.cfg"],
   }
 
   mcollective::connector { '/etc/mcollective/server.cfg':
@@ -57,6 +59,6 @@ class mcollective::server(
   }
 
   include mcollective::server::defaultplugins
-  include mcollective::server::plugindir
-
+  include mcollective::server::core_plugins
+  include mcollective::server::custom_plugins
 }

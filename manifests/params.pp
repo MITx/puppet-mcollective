@@ -1,25 +1,33 @@
-class mcollective::params {
+class mcollective::params(
+  $topicprefix          = '/topic/',
+  $logfile              = '/var/log/mcollective.log',
+  $mcollective_loglevel = 'warn',
+  $extra_libdirs        = [],
+) {
 
-  $topicprefix = '/topic/'
-  $sharedir    = '/usr/share/mcollective'
-  $libdir      = "${sharedir}/plugins"
-  $logfile     = '/var/log/mcollective.log'
+  case $osfamily {
+    'FreeBSD': {
+      $sharedir        = '/usr/local/share/mcollective'
+      $core_libdir     = $sharedir
+      $configdir       = '/usr/local/etc/mcollective'
+      $servicename     = 'mcollectived'
+      $custom_sharedir = '/var/mcollective'
+    }
+    'RedHat': {
+      $sharedir        = '/usr/libexec/mcollective'
+      $core_libdir     = $sharedir
+      $configdir       = '/etc/mcollective'
+      $servicename     = 'mcollective'
+      $custom_sharedir = '/var/lib/mcollective'
+    }
+    default: {
+      $sharedir        = '/usr/share/mcollective'
+      $core_libdir     = "${sharedir}/plugins"
+      $configdir       = '/etc/mcollective'
+      $servicename     = 'mcollective'
+      $custom_sharedir = '/var/lib/mcollective'
+    }
+  }
 
-  $loglevel = hiera('mcollective_loglevel', 'warn')
-
-  $host = hiera('mcollective_host')
-  # port 61613 is more standard for the stomp protocol
-  $port = hiera('mcollective_port', '61614')
-
-  $user     = hiera('mcollective_user')
-  $password = hiera('mcollective_password')
-
-  $psk = hiera('mcollective_psk')
-
-  $connector_host     = hiera(mcollective::server::connector_host, 'localhost')
-  $connector_port     = hiera(mcollective::server::connector_port, '61614')
-  $connector_user     = hiera(mcollective::server::connector_user, 'mcollective')
-  $connector_password = hiera(mcollective::server::connector_password, 'mcollective')
-  $connector_ssl      = hiera(mcollective::server::connector_ssl, {})
-  $connector_type     = hiera(mcollective::server::connector_type, 'activemq')
+  $custom_libdir = "${custom_sharedir}/plugins"
 }
