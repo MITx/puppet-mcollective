@@ -1,27 +1,7 @@
 class mcollective::package::server {
 
   include mcollective::params
-
-  # ---
-  # package requirements
-
-  case $::osfamily {
-    Debian: {
-      # Switch to a gem because of how outdated the stomp package is.
-      package { 'stomp':
-        ensure   => present,
-        provider => gem,
-        before   => Package['mcollective'],
-      }
-    }
-    FreeBSD: {
-      package { 'stomp':
-        ensure   => present,
-        provider => gem,
-        before   => Package['mcollective'],
-      }
-    }
-  }
+  require mcollective::package::stomp
 
   package { 'mcollective':
     ensure  => present,
